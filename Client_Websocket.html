@@ -1,0 +1,63 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.4/jspdf.min.js"></script>
+    <script type="module" src="index.js"></script>
+    <script type="module" src="another-file.js"></script>
+    
+    <title>Chat</title>
+</head>
+<body>
+<h2>WEB SOCKETS</h2>
+<br>
+<h3>INGRESAR TEXTO PARA IMPRIMIR</h3>
+<br>
+<textarea id="texto" rows="4" cols="40" placeholder="Escriba algo"></textarea>
+<br>
+<br>
+<div>
+	<button onclick="connect()">
+	  <img src="https://cdn-icons-png.flaticon.com/512/1803/1803974.png" alt="imagen" width="32" height="32" style="vertical-align: middle">
+	  Conectar
+	</button>
+	
+	<button onclick="sendFile()">
+	  <img src="https://cdn-icons-png.flaticon.com/512/813/813078.png" alt="imagen" width="32" height="32" style="vertical-align: middle">
+	  Imprimir
+	</button>
+</div>
+<script>
+    var ws;
+
+    function connect() {
+        ws = new WebSocket("ws://localhost:8025/websockets/receive/fileserver");
+        ws.binaryType = "arraybuffer";
+        ws.onopen = function() {
+            alert("Connected.")
+        };
+
+        ws.onmessage = function(evt) {
+            alert(evt.msg);
+        };
+
+        ws.onclose = function() {
+            alert("Connection closed...");
+        };
+        ws.onerror = function(e) {
+            alert(e.msg);
+        }
+
+    }
+
+    function sendFile() {
+    	var doc = new jsPDF();
+    	doc.text(document.getElementById('texto').value, 10, 10);
+    	var fileName = "imprimir.pdf";
+    	doc.save(fileName);
+      	ws.send("imprimir.pdf");	
+    }
+
+
+</script>
+</body>
+</html>
